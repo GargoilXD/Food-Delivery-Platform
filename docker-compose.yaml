@@ -84,6 +84,12 @@ services:
       dockerfile: eureka-server/Dockerfile
     container_name: eureka-server
     ports: ["8761:8761"]
+    healthcheck:
+      test: [ "CMD-SHELL", "bash -c '</dev/tcp/localhost/8761' 2>/dev/null" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
     networks: [food-delivery-network]
 
   auth-microservice:
@@ -100,9 +106,10 @@ services:
       rabbitmq:
         condition: service_healthy
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
+      - DB_URL=jdbc:postgresql://postgres-auth:5432/auth_db
       - DB_USERNAME=postgres
       - DB_PASSWORD=postgres
+      - DEFAULT_ZONE=http://eureka-server:8761/eureka/
     networks: [food-delivery-network]
 
   customer-microservice:
@@ -119,8 +126,10 @@ services:
       rabbitmq:
         condition: service_healthy
     environment:
+      - DB_URL=jdbc:postgresql://postgres-customer:5432/customer_db
       - DB_USERNAME=postgres
       - DB_PASSWORD=postgres
+      - DEFAULT_ZONE=http://eureka-server:8761/eureka/
     networks: [food-delivery-network]
 
   order-microservice:
@@ -137,8 +146,10 @@ services:
       rabbitmq:
         condition: service_healthy
     environment:
+      - DB_URL=jdbc:postgresql://postgres-order:5432/order_db
       - DB_USERNAME=postgres
       - DB_PASSWORD=postgres
+      - DEFAULT_ZONE=http://eureka-server:8761/eureka/
     networks: [food-delivery-network]
 
   restaurant-microservice:
@@ -155,8 +166,10 @@ services:
       rabbitmq:
         condition: service_healthy
     environment:
+      - DB_URL=jdbc:postgresql://postgres-restaurant:5432/restaurant_db
       - DB_USERNAME=postgres
       - DB_PASSWORD=postgres
+      - DEFAULT_ZONE=http://eureka-server:8761/eureka/
     networks: [food-delivery-network]
 
   delivery-microservice:
@@ -173,8 +186,10 @@ services:
       rabbitmq:
         condition: service_healthy
     environment:
+      - DB_URL=jdbc:postgresql://postgres-delivery:5432/delivery_db
       - DB_USERNAME=postgres
       - DB_PASSWORD=postgres
+      - DEFAULT_ZONE=http://eureka-server:8761/eureka/
     networks: [food-delivery-network]
 
   api-gateway:
@@ -186,6 +201,8 @@ services:
     depends_on:
       eureka-server:
         condition: service_healthy
+    environment:
+      - DEFAULT_ZONE=http://eureka-server:8761/eureka/
     networks: [food-delivery-network]
 
 networks:

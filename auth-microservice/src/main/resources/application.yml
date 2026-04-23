@@ -1,0 +1,60 @@
+spring:
+  application:
+    name: auth-service
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/auth_db}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  rabbitmq:
+    host: ${RABBITMQ_HOST:rabbitmq}
+    port: 5672
+    username: ${RABBITMQ_USERNAME:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+  cloud:
+    stream:
+      bindings:
+        userEvents-out-0:
+          destination: user.events
+          content-type: application/json
+      rabbit:
+        bindings:
+          userEvents-out-0:
+            producer:
+              exchange-type: topic
+
+eureka:
+  client:
+    enabled: true
+    service-url:
+      defaultZone: ${DEFAULT_ZONE:http://localhost:8761/eureka/}
+  instance:
+    prefer-ip-address: true
+
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 5000
+        loggerLevel: basic
+
+jwt:
+  private-key-path: classpath:keys/private.pem
+  public-key-path: classpath:keys/public.pem
+  issuer: auth-service
+  expiration-minutes: 30
+
+server:
+  port: 8081
+
+logging:
+  level:
+    root: INFO
+    com.auth: DEBUG
+    org.springframework.security: WARN
+    org.hibernate.SQL: WARN

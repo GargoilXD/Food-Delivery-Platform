@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: delivery-service
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/delivery_db}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${DEFAULT_ZONE:http://localhost:8761/eureka/}
+
+app:
+  queues:
+    orderPlaced: order.placed.queue
+    orderCancelled: order.cancelled.queue
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+
+server:
+  port: 8085
+
+logging:
+  level:
+    root: INFO
+    com.delivery.service: DEBUG
+    org.hibernate.SQL: WARN
