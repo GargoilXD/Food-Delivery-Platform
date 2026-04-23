@@ -1,0 +1,18 @@
+package com.auth.controller;
+
+import com.auth.service.JwtTokenProvider;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class JwksController {
+    private final JwtTokenProvider jwtTokenProvider;
+    public JwksController(JwtTokenProvider jwtTokenProvider) { this.jwtTokenProvider = jwtTokenProvider; }
+
+    @GetMapping(value = "/.well-known/jwks.json", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> jwks() {
+        return ResponseEntity.ok(jwtTokenProvider.getJwksJson());
+    }
+}

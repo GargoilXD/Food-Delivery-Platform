@@ -30,16 +30,17 @@ import java.util.stream.Collectors;
 
 @Service
 public class JwtTokenProvider {
-
     private final RSAPrivateKey privateKey;
     private final RSAPublicKey publicKey;
     private final String issuer;
     private final long expirationMinutes;
 
-    public JwtTokenProvider(@Value("${jwt.private-key-path}") String privateKeyPath,
-                            @Value("${jwt.public-key-path}") String publicKeyPath,
-                            @Value("${jwt.issuer}") String issuer,
-                            @Value("${jwt.expiration-minutes}") long expirationMinutes) throws Exception {
+    public JwtTokenProvider(
+            @Value("${jwt.private-key-path}") String privateKeyPath,
+            @Value("${jwt.public-key-path}") String publicKeyPath,
+            @Value("${jwt.issuer}") String issuer,
+            @Value("${jwt.expiration-minutes}") long expirationMinutes
+    ) throws Exception {
         this.privateKey = loadRsaPrivateKey(privateKeyPath);
         this.publicKey = loadRsaPublicKey(publicKeyPath);
         this.issuer = issuer;
