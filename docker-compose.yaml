@@ -1,0 +1,193 @@
+version: '3.8'
+
+services:
+  postgres-auth:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: auth_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d auth_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [food-delivery-network]
+
+  postgres-customer:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: customer_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d customer_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [food-delivery-network]
+
+  postgres-order:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: order_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d order_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [food-delivery-network]
+
+  postgres-restaurant:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: restaurant_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d restaurant_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [food-delivery-network]
+
+  postgres-delivery:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: delivery_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d delivery_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [food-delivery-network]
+
+  rabbitmq:
+    image: rabbitmq:3.11.11-management
+    container_name: rabbitmq
+    ports: ["5672:5672", "15672:15672"]
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks: [food-delivery-network]
+
+  eureka-server:
+    build:
+      context: .
+      dockerfile: eureka-server/Dockerfile
+    container_name: eureka-server
+    ports: ["8761:8761"]
+    networks: [food-delivery-network]
+
+  auth-microservice:
+    build:
+      context: .
+      dockerfile: auth-microservice/Dockerfile
+    container_name: auth-microservice
+    ports: ["8081:8081"]
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      postgres-auth:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+    networks: [food-delivery-network]
+
+  customer-microservice:
+    build:
+      context: .
+      dockerfile: customer-microservice/Dockerfile
+    container_name: customer-microservice
+    ports: ["8082:8082"]
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      postgres-customer:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+    networks: [food-delivery-network]
+
+  order-microservice:
+    build:
+      context: .
+      dockerfile: order-microservice/Dockerfile
+    container_name: order-microservice
+    ports: ["8083:8083"]
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      postgres-order:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+    networks: [food-delivery-network]
+
+  restaurant-microservice:
+    build:
+      context: .
+      dockerfile: restaurant-microservice/Dockerfile
+    container_name: restaurant-microservice
+    ports: ["8084:8084"]
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      postgres-restaurant:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+    networks: [food-delivery-network]
+
+  delivery-microservice:
+    build:
+      context: .
+      dockerfile: delivery-microservice/Dockerfile
+    container_name: delivery-microservice
+    ports: ["8085:8085"]
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      postgres-delivery:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+    networks: [food-delivery-network]
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: api-gateway/Dockerfile
+    container_name: api-gateway
+    ports: ["8080:8080"]
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    networks: [food-delivery-network]
+
+networks:
+  food-delivery-network:
+    driver: bridge
