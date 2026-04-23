@@ -30,3 +30,4 @@ build/
 
 ### VS Code ###
 .vscode/
+/auth-microservice/src/main/resources/keys/
