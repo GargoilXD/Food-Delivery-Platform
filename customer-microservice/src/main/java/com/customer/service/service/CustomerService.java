@@ -9,6 +9,7 @@ import com.customer.service.repository.CustomerRepository;
 import com.shared.definitions.exception.DuplicateResourceException;
 import com.shared.definitions.exception.ResourceNotFoundException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
@@ -16,16 +17,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class CustomerService {
     private final CustomerRepository customerRepository;
     private final AuthClient authClient;
     private final RabbitTemplate rabbitTemplate;
-
-    public CustomerService(CustomerRepository customerRepository, AuthClient authClient, RabbitTemplate rabbitTemplate) {
-        this.customerRepository = customerRepository;
-        this.authClient = authClient;
-        this.rabbitTemplate = rabbitTemplate;
-    }
 
     @Transactional
     @CircuitBreaker(name = "authService", fallbackMethod = "createCustomerFallback")

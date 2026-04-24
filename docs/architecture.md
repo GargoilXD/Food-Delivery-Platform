@@ -29,8 +29,9 @@ flowchart TD
     delivery --> eureka
     gateway --> eureka
 
-    order -->|"OrderPlacedEvent (order.placed)"| rabbit
-    rabbit --> delivery
+    order -->|"OrderPlacedEvent / OrderCancelledEvent"| rabbit
+    rabbit -->|"order.placed / order.cancelled"| delivery
+    order -.->|"DeliveryClient (Feign)"| delivery
 ```
 
 ## Notes

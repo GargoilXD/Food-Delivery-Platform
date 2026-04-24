@@ -2,17 +2,15 @@ package com.delivery.service.controller;
 
 import com.delivery.service.dto.DeliveryResponse;
 import com.delivery.service.service.DeliveryService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/deliveries")
+@RequiredArgsConstructor
 public class DeliveryController {
     private final DeliveryService deliveryService;
-
-    public DeliveryController(DeliveryService deliveryService) {
-        this.deliveryService = deliveryService;
-    }
 
     @GetMapping("/{id}")
     public ResponseEntity<DeliveryResponse> getById(@PathVariable Long id) {

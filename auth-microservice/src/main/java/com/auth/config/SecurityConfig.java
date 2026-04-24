@@ -22,7 +22,7 @@ public class SecurityConfig {
                         .requestMatchers("/auth/**", "/.well-known/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                .httpBasic(basic -> basic.disable())
+                .httpBasic(AbstractHttpConfigurer::disable)
                 .build();
     }
 

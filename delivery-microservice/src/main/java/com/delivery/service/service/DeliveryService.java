@@ -7,6 +7,7 @@ import com.delivery.service.dto.OrderPlacedEvent;
 import com.delivery.service.model.Delivery;
 import com.delivery.service.repository.DeliveryRepository;
 import com.shared.definitions.exception.ResourceNotFoundException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -17,17 +18,13 @@ import java.time.LocalDateTime;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class DeliveryService {
     private static final String[] DRIVERS = {"Carlos M.", "Sarah J.", "Mike C.", "Priya P.", "James W."};
     private static final String[] PHONES = {"+1-555-0101", "+1-555-0102", "+1-555-0103", "+1-555-0104", "+1-555-0105"};
 
     private final DeliveryRepository deliveryRepository;
     private final RabbitTemplate rabbitTemplate;
-
-    public DeliveryService(DeliveryRepository deliveryRepository, RabbitTemplate rabbitTemplate) {
-        this.deliveryRepository = deliveryRepository;
-        this.rabbitTemplate = rabbitTemplate;
-    }
 
     @RabbitListener(queues = "${app.queues.orderPlaced:order.placed.queue}")
     @Transactional

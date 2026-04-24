@@ -28,8 +28,7 @@
 - `POST /orders?customerId=...` -> place order.
 - `GET /orders/{id}` -> get order by id.
 - `GET /orders?customerId=...` -> list customer orders.
-- `GET /restaurants/{restaurantId}/orders` -> list restaurant orders.
-- {{baseUrl}}/api/orders/restaurants/{{restaurantId}}
+- `GET /orders/restaurants/{restaurantId}` -> list restaurant orders.
 - `PATCH /orders/{id}/status?status=...` -> update order status.
 - `POST /orders/{id}/cancel?customerId=...` -> cancel order.
 
@@ -37,8 +36,3 @@
 - `GET /deliveries/{id}` -> fetch delivery by id.
 - `GET /deliveries/by-order/{orderId}` -> fetch delivery assigned to order.
 - `PATCH /deliveries/{id}/status?status=...` -> update delivery status.
-
-## Order Service — Delivery Proxy (direct at `:8083`, not via gateway)
-OrderController also exposes two delivery pass-through endpoints that call the delivery service internally. These are **not** reachable through the gateway's `/api/orders/**` route because the path prefix does not match after `StripPrefix=1`.
-- `GET /deliveries/by-order/{orderId}` -> proxied delivery lookup by order.
-- `PATCH /deliveries/{deliveryId}/status?status=...` -> proxied delivery status update.

@@ -9,6 +9,5 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
     List<Restaurant> findByActiveTrue();
     List<Restaurant> findByCityIgnoreCaseAndActiveTrue(String city);
     List<Restaurant> findByCuisineTypeIgnoreCaseAndActiveTrue(String cuisineType);
-    // MONOLITH: cross-domain query using Customer (owner) relationship
     List<Restaurant> findByOwnerId(Long ownerId);
 }

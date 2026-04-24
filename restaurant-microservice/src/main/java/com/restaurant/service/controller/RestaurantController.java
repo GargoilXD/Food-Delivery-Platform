@@ -6,6 +6,7 @@ import com.restaurant.service.dto.RestaurantRequest;
 import com.restaurant.service.dto.RestaurantResponse;
 import com.restaurant.service.service.RestaurantService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,16 +15,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping
+@RequiredArgsConstructor
 public class RestaurantController {
     private final RestaurantService restaurantService;
 
-    public RestaurantController(RestaurantService restaurantService) {
-        this.restaurantService = restaurantService;
-    }
-
     @PostMapping("/restaurants")
-    public ResponseEntity<RestaurantResponse> createRestaurant(@RequestParam Long ownerId,
-                                                               @Valid @RequestBody RestaurantRequest request) {
+    public ResponseEntity<RestaurantResponse> createRestaurant(@RequestParam Long ownerId, @Valid @RequestBody RestaurantRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(restaurantService.createRestaurant(ownerId, request));
     }
 
@@ -33,8 +30,7 @@ public class RestaurantController {
     }
 
     @GetMapping("/restaurants")
-    public ResponseEntity<List<RestaurantResponse>> search(@RequestParam(required = false) String city,
-                                                           @RequestParam(required = false) String cuisineType) {
+    public ResponseEntity<List<RestaurantResponse>> search(@RequestParam(required = false) String city, @RequestParam(required = false) String cuisineType) {
         if (city != null && !city.isBlank()) {
             return ResponseEntity.ok(restaurantService.searchByCity(city));
         }
@@ -42,9 +38,11 @@ public class RestaurantController {
     }
 
     @PostMapping("/restaurants/{restaurantId}/menu-items")
-    public ResponseEntity<MenuItemResponse> addMenuItem(@PathVariable Long restaurantId,
-                                                        @RequestParam Long ownerId,
-                                                        @Valid @RequestBody MenuItemRequest request) {
+    public ResponseEntity<MenuItemResponse> addMenuItem(
+            @PathVariable Long restaurantId,
+            @RequestParam Long ownerId,
+            @Valid @RequestBody MenuItemRequest request
+    ) {
         return ResponseEntity.ok(restaurantService.addMenuItem(restaurantId, ownerId, request));
     }
 
@@ -54,9 +52,11 @@ public class RestaurantController {
     }
 
     @PutMapping("/menu-items/{itemId}")
-    public ResponseEntity<MenuItemResponse> updateMenuItem(@PathVariable Long itemId,
-                                                           @RequestParam Long ownerId,
-                                                           @RequestBody MenuItemRequest request) {
+    public ResponseEntity<MenuItemResponse> updateMenuItem(
+            @PathVariable Long itemId,
+           @RequestParam Long ownerId,
+           @RequestBody MenuItemRequest request
+    ) {
         return ResponseEntity.ok(restaurantService.updateMenuItem(itemId, ownerId, request));
     }
 

@@ -9,6 +9,7 @@ import com.order.service.repository.OrderRepository;
 import com.shared.definitions.exception.ResourceNotFoundException;
 import com.shared.definitions.exception.UnauthorizedException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
@@ -20,21 +21,12 @@ import java.util.List;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class OrderService {
     private final OrderRepository orderRepository;
     private final CustomerClient customerClient;
     private final RestaurantClient restaurantClient;
     private final RabbitTemplate rabbitTemplate;
-
-    public OrderService(OrderRepository orderRepository,
-                        CustomerClient customerClient,
-                        RestaurantClient restaurantClient,
-                        RabbitTemplate rabbitTemplate) {
-        this.orderRepository = orderRepository;
-        this.customerClient = customerClient;
-        this.restaurantClient = restaurantClient;
-        this.rabbitTemplate = rabbitTemplate;
-    }
 
     @Transactional
     @CircuitBreaker(name = "customerService", fallbackMethod = "placeOrderFallback")

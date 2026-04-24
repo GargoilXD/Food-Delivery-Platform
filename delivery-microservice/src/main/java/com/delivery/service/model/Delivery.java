@@ -1,11 +1,15 @@
 package com.delivery.service.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "deliveries")
+@Setter
+@Getter
 public class Delivery {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,20 +41,5 @@ public class Delivery {
         updatedAt = LocalDateTime.now();
     }
 
-    public enum DeliveryStatus {ASSIGNED, PICKED_UP, IN_TRANSIT, DELIVERED, FAILED}
-    public Long getId() { return id; }
-    public Long getOrderId() { return orderId; }
-    public Long getCustomerId() { return customerId; }
-    public Long getRestaurantId() { return restaurantId; }
-    public DeliveryStatus getStatus() { return status; }
-    public String getDriverName() { return driverName; }
-    public String getDriverPhone() { return driverPhone; }
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
-    public void setOrderId(Long orderId) { this.orderId = orderId; }
-    public void setCustomerId(Long customerId) { this.customerId = customerId; }
-    public void setRestaurantId(Long restaurantId) { this.restaurantId = restaurantId; }
-    public void setStatus(DeliveryStatus status) { this.status = status; }
-    public void setDriverName(String driverName) { this.driverName = driverName; }
-    public void setDriverPhone(String driverPhone) { this.driverPhone = driverPhone; }
+    public enum DeliveryStatus { ASSIGNED, PICKED_UP, IN_TRANSIT, DELIVERED, FAILED }
 }

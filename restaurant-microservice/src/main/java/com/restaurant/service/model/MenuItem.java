@@ -1,11 +1,15 @@
 package com.restaurant.service.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 
 @Entity
 @Table(name = "menu_items")
+@Setter
+@Getter
 public class MenuItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,20 +32,4 @@ public class MenuItem {
     protected void onCreate() {
         available = true;
     }
-
-    public Long getId() { return id; }
-    public String getName() { return name; }
-    public String getDescription() { return description; }
-    public BigDecimal getPrice() { return price; }
-    public String getCategory() { return category; }
-    public boolean isAvailable() { return available; }
-    public String getImageUrl() { return imageUrl; }
-    public Restaurant getRestaurant() { return restaurant; }
-    public void setName(String name) { this.name = name; }
-    public void setDescription(String description) { this.description = description; }
-    public void setPrice(BigDecimal price) { this.price = price; }
-    public void setCategory(String category) { this.category = category; }
-    public void setAvailable(boolean available) { this.available = available; }
-    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
-    public void setRestaurant(Restaurant restaurant) { this.restaurant = restaurant; }
 }

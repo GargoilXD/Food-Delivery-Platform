@@ -1,6 +1,8 @@
 package com.order.service.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -9,8 +11,9 @@ import java.util.List;
 
 @Entity
 @Table(name = "orders")
+@Setter
+@Getter
 public class Order {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -62,28 +65,4 @@ public class Order {
         PLACED, CONFIRMED, PREPARING, READY_FOR_PICKUP,
         OUT_FOR_DELIVERY, DELIVERED, CANCELLED
     }
-
-    public Long getId() { return id; }
-    public OrderStatus getStatus() { return status; }
-    public BigDecimal getTotalAmount() { return totalAmount; }
-    public BigDecimal getDeliveryFee() { return deliveryFee; }
-    public String getCustomerUsername() { return customerUsername; }
-    public String getRestaurantName() { return restaurantName; }
-    public String getDeliveryAddress() { return deliveryAddress; }
-    public String getSpecialInstructions() { return specialInstructions; }
-    public LocalDateTime getEstimatedDeliveryTime() { return estimatedDeliveryTime; }
-    public Long getCustomerId() { return customerId; }
-    public Long getRestaurantId() { return restaurantId; }
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public List<OrderItem> getItems() { return items; }
-    public void setStatus(OrderStatus status) { this.status = status; }
-    public void setTotalAmount(BigDecimal totalAmount) { this.totalAmount = totalAmount; }
-    public void setDeliveryFee(BigDecimal deliveryFee) { this.deliveryFee = deliveryFee; }
-    public void setCustomerUsername(String customerUsername) { this.customerUsername = customerUsername; }
-    public void setRestaurantName(String restaurantName) { this.restaurantName = restaurantName; }
-    public void setDeliveryAddress(String deliveryAddress) { this.deliveryAddress = deliveryAddress; }
-    public void setSpecialInstructions(String specialInstructions) { this.specialInstructions = specialInstructions; }
-    public void setEstimatedDeliveryTime(LocalDateTime estimatedDeliveryTime) { this.estimatedDeliveryTime = estimatedDeliveryTime; }
-    public void setCustomerId(Long customerId) { this.customerId = customerId; }
-    public void setRestaurantId(Long restaurantId) { this.restaurantId = restaurantId; }
 }

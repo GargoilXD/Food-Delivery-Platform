@@ -4,6 +4,7 @@ import com.order.service.dto.OrderResponse;
 import com.order.service.dto.PlaceOrderRequest;
 import com.order.service.service.OrderService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,12 +12,9 @@ import java.util.List;
 
 @RestController
 @RequestMapping
+@RequiredArgsConstructor
 public class OrderController {
     private final OrderService orderService;
-
-    public OrderController(OrderService orderService) {
-        this.orderService = orderService;
-    }
 
     @PostMapping("/orders")
     public ResponseEntity<OrderResponse> placeOrder(@RequestParam Long customerId, @Valid @RequestBody PlaceOrderRequest request) {

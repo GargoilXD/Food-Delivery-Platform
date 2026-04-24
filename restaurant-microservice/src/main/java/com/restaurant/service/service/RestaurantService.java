@@ -12,6 +12,7 @@ import com.restaurant.service.repository.RestaurantRepository;
 import com.shared.definitions.exception.ResourceNotFoundException;
 import com.shared.definitions.exception.UnauthorizedException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,19 +21,11 @@ import java.util.List;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class RestaurantService {
-
     private final RestaurantRepository restaurantRepository;
     private final MenuItemRepository menuItemRepository;
-    private final CustomerClient customerClient; // Feign: validates ownerId
-
-    public RestaurantService(RestaurantRepository restaurantRepository,
-                             MenuItemRepository menuItemRepository,
-                             CustomerClient customerClient) {
-        this.restaurantRepository = restaurantRepository;
-        this.menuItemRepository = menuItemRepository;
-        this.customerClient = customerClient;
-    }
+    private final CustomerClient customerClient;
 
     @Transactional
     @CircuitBreaker(name = "customerService", fallbackMethod = "createRestaurantFallback")
@@ -144,7 +137,6 @@ public class RestaurantService {
         log.info("Menu item availability toggled: itemId={}, available={}", itemId, item.isAvailable());
     }
 
-    // Internal: for Order Service to fetch restaurant snapshot
     @Transactional(readOnly = true)
     public RestaurantSnapshot getRestaurantSnapshot(Long id) {
         Restaurant r = restaurantRepository.findById(id)

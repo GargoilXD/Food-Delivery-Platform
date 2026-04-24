@@ -28,3 +28,10 @@
 ## 6) Fault Tolerance
 - Added baseline Resilience4j circuit breaker on order placement path with fallback error.
 - Added resilience configuration entries under `order-microservice` settings.
+
+## 7) Order/Delivery Separation
+- Removed `Delivery` JPA entity, `DeliveryRepository`, and `DeliveryResponse` DTO from `order-microservice`.
+- Removed delivery proxy endpoints (`GET /deliveries/by-order/{orderId}`, `PATCH /deliveries/{deliveryId}/status`) from `OrderController` — these belong exclusively to `delivery-microservice`.
+- Removed inline delivery state mutations from `OrderService` (driver pool simulation, `createDeliveryForOrder`, status sync on cancel/deliver). Delivery lifecycle is fully event-driven via RabbitMQ.
+- Added `DeliveryClient` Feign interface in `order-microservice` for any future typed calls to `delivery-service`.
+- `OrderResponse` no longer includes `deliveryStatus`, `driverName`, or `driverPhone`; clients requiring delivery tracking should query `GET /deliveries/by-order/{orderId}` directly.
