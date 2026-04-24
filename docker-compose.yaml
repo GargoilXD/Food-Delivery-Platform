@@ -110,6 +110,7 @@ services:
       - DB_USERNAME=postgres
       - DB_PASSWORD=postgres
       - DEFAULT_ZONE=http://eureka-server:8761/eureka/
+      - RABBITMQ_HOST=rabbitmq
     networks: [food-delivery-network]
 
   customer-microservice:
@@ -130,6 +131,7 @@ services:
       - DB_USERNAME=postgres
       - DB_PASSWORD=postgres
       - DEFAULT_ZONE=http://eureka-server:8761/eureka/
+      - RABBITMQ_HOST=rabbitmq
     networks: [food-delivery-network]
 
   order-microservice:
@@ -150,6 +152,7 @@ services:
       - DB_USERNAME=postgres
       - DB_PASSWORD=postgres
       - DEFAULT_ZONE=http://eureka-server:8761/eureka/
+      - RABBITMQ_HOST=rabbitmq
     networks: [food-delivery-network]
 
   restaurant-microservice:
@@ -170,6 +173,7 @@ services:
       - DB_USERNAME=postgres
       - DB_PASSWORD=postgres
       - DEFAULT_ZONE=http://eureka-server:8761/eureka/
+      - RABBITMQ_HOST=rabbitmq
     networks: [food-delivery-network]
 
   delivery-microservice:
@@ -190,6 +194,7 @@ services:
       - DB_USERNAME=postgres
       - DB_PASSWORD=postgres
       - DEFAULT_ZONE=http://eureka-server:8761/eureka/
+      - RABBITMQ_HOST=rabbitmq
     networks: [food-delivery-network]
 
   api-gateway:
