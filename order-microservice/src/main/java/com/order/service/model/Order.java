@@ -38,10 +38,6 @@ public class Order {
     @Column(nullable = false)
     private Long restaurantId;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "delivery_id", foreignKey = @ForeignKey(name = "fk_order_delivery"))
-    private Delivery delivery;
-
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -78,7 +74,6 @@ public class Order {
     public LocalDateTime getEstimatedDeliveryTime() { return estimatedDeliveryTime; }
     public Long getCustomerId() { return customerId; }
     public Long getRestaurantId() { return restaurantId; }
-    public Delivery getDelivery() { return delivery; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public List<OrderItem> getItems() { return items; }
     public void setStatus(OrderStatus status) { this.status = status; }
@@ -91,5 +86,4 @@ public class Order {
     public void setEstimatedDeliveryTime(LocalDateTime estimatedDeliveryTime) { this.estimatedDeliveryTime = estimatedDeliveryTime; }
     public void setCustomerId(Long customerId) { this.customerId = customerId; }
     public void setRestaurantId(Long restaurantId) { this.restaurantId = restaurantId; }
-    public void setDelivery(Delivery delivery) { this.delivery = delivery; }
 }

@@ -3,10 +3,8 @@ package com.order.service.service;
 import com.order.service.client.CustomerClient;
 import com.order.service.client.RestaurantClient;
 import com.order.service.dto.*;
-import com.order.service.model.Delivery;
 import com.order.service.model.Order;
 import com.order.service.model.OrderItem;
-import com.order.service.repository.DeliveryRepository;
 import com.order.service.repository.OrderRepository;
 import com.shared.definitions.exception.ResourceNotFoundException;
 import com.shared.definitions.exception.UnauthorizedException;
@@ -24,22 +22,15 @@ import java.util.List;
 @Service
 public class OrderService {
     private final OrderRepository orderRepository;
-    private final DeliveryRepository deliveryRepository;
-    private final CustomerClient customerClient; // Feign
-    private final RestaurantClient restaurantClient; // Feign
+    private final CustomerClient customerClient;
+    private final RestaurantClient restaurantClient;
     private final RabbitTemplate rabbitTemplate;
 
-    // Simulated driver pool (replace with Driver Service later)
-    private static final String[] DRIVERS = {"Carlos M.", "Sarah J.", "Mike C.", "Priya P.", "James W."};
-    private static final String[] PHONES = {"+1-555-0101", "+1-555-0102", "+1-555-0103", "+1-555-0104", "+1-555-0105"};
-
     public OrderService(OrderRepository orderRepository,
-                        DeliveryRepository deliveryRepository,
                         CustomerClient customerClient,
                         RestaurantClient restaurantClient,
                         RabbitTemplate rabbitTemplate) {
         this.orderRepository = orderRepository;
-        this.deliveryRepository = deliveryRepository;
         this.customerClient = customerClient;
         this.restaurantClient = restaurantClient;
         this.rabbitTemplate = rabbitTemplate;
@@ -99,9 +90,6 @@ public class OrderService {
         order.setTotalAmount(total);
         Order savedOrder = orderRepository.save(order);
 
-        Delivery delivery = createDeliveryForOrder(savedOrder, customer.deliveryAddress(), restaurant.address());
-        savedOrder.setDelivery(delivery);
-
         rabbitTemplate.convertAndSend("order.events", "order.placed", new OrderPlacedEvent(
                 savedOrder.getId(), savedOrder.getCustomerId(), savedOrder.getRestaurantId(), total
         ));
@@ -113,21 +101,6 @@ public class OrderService {
     private OrderResponse placeOrderFallback(Long customerId, PlaceOrderRequest request, Throwable throwable) {
         log.warn("Order placement circuit breaker triggered: customerId={}, cause={}", customerId, throwable.getMessage());
         throw new IllegalStateException("Unable to place order because a dependent service is unavailable", throwable);
-    }
-
-    private Delivery createDeliveryForOrder(Order order, String customerAddress, String restaurantAddress) {
-        int driverIndex = (int) (Math.random() * DRIVERS.length);
-        Delivery delivery = new Delivery();
-        delivery.setStatus(Delivery.DeliveryStatus.ASSIGNED);
-        delivery.setDriverName(DRIVERS[driverIndex]);
-        delivery.setDriverPhone(PHONES[driverIndex]);
-        delivery.setPickupAddress(restaurantAddress);
-        delivery.setDeliveryAddress(order.getDeliveryAddress());
-        delivery.setAssignedAt(LocalDateTime.now());
-        Delivery saved = deliveryRepository.save(delivery);
-        saved.setOrder(order);
-        log.info("Delivery assigned: orderId={}, driver={}", order.getId(), DRIVERS[driverIndex]);
-        return saved;
     }
 
     @Transactional(readOnly = true)
@@ -155,16 +128,7 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order", "id", orderId));
 
-        Order.OrderStatus newStatus = Order.OrderStatus.valueOf(status.toUpperCase());
-        order.setStatus(newStatus);
-
-        if (newStatus == Order.OrderStatus.DELIVERED && order.getDelivery() != null) {
-            Delivery d = order.getDelivery();
-            d.setStatus(Delivery.DeliveryStatus.DELIVERED);
-            d.setDeliveredAt(LocalDateTime.now());
-            deliveryRepository.save(d);
-        }
-
+        order.setStatus(Order.OrderStatus.valueOf(status.toUpperCase()));
         return OrderResponse.fromEntity(orderRepository.save(order));
     }
 
@@ -186,13 +150,6 @@ public class OrderService {
         }
 
         order.setStatus(Order.OrderStatus.CANCELLED);
-
-        if (order.getDelivery() != null) {
-            Delivery d = order.getDelivery();
-            d.setStatus(Delivery.DeliveryStatus.FAILED);
-            deliveryRepository.save(d);
-        }
-
         Order saved = orderRepository.save(order);
 
         rabbitTemplate.convertAndSend("order.events", "order.cancelled", new OrderCancelledEvent(
@@ -201,38 +158,5 @@ public class OrderService {
 
         log.info("Order cancelled: orderId={}", orderId);
         return OrderResponse.fromEntity(saved);
-    }
-
-    // Delivery-specific endpoints (since Delivery is in same service)
-    @Transactional(readOnly = true)
-    public DeliveryResponse getDeliveryByOrderId(Long orderId) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order", "id", orderId));
-        if (order.getDelivery() == null) {
-            throw new ResourceNotFoundException("Delivery", "orderId", orderId);
-        }
-        return DeliveryResponse.fromEntity(order.getDelivery());
-    }
-
-    @Transactional
-    public DeliveryResponse updateDeliveryStatus(Long deliveryId, String status) {
-        log.info("Updating delivery status: deliveryId={}, newStatus={}", deliveryId, status);
-        Delivery delivery = deliveryRepository.findById(deliveryId)
-                .orElseThrow(() -> new ResourceNotFoundException("Delivery", "id", deliveryId));
-
-        Delivery.DeliveryStatus newStatus = Delivery.DeliveryStatus.valueOf(status.toUpperCase());
-        delivery.setStatus(newStatus);
-
-        if (newStatus == Delivery.DeliveryStatus.PICKED_UP) {
-            delivery.setPickedUpAt(LocalDateTime.now());
-        } else if (newStatus == Delivery.DeliveryStatus.DELIVERED) {
-            delivery.setDeliveredAt(LocalDateTime.now());
-            if (delivery.getOrder() != null) {
-                delivery.getOrder().setStatus(Order.OrderStatus.DELIVERED);
-                orderRepository.save(delivery.getOrder());
-            }
-        }
-
-        return DeliveryResponse.fromEntity(deliveryRepository.save(delivery));
     }
 }

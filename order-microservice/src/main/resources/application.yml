@@ -40,6 +40,8 @@ services:
     url: http://customer-microservice:8082
   restaurant:
     url: http://restaurant-microservice:8084
+  delivery:
+    url: http://delivery-microservice:8085
 
 resilience4j:
   circuitbreaker:

@@ -19,10 +19,7 @@ public record OrderResponse(
         Long customerId,
         String customerName,
         Long restaurantId,
-        String restaurantName,
-        String deliveryStatus,
-        String driverName,
-        String driverPhone
+        String restaurantName
 ) {
     public record OrderItemDetail(
             Long id,
@@ -33,10 +30,6 @@ public record OrderResponse(
     ) {}
 
     public static OrderResponse fromEntity(Order o) {
-        String deliveryStatus = o.getDelivery() != null ? o.getDelivery().getStatus().name() : null;
-        String driverName = o.getDelivery() != null ? o.getDelivery().getDriverName() : null;
-        String driverPhone = o.getDelivery() != null ? o.getDelivery().getDriverPhone() : null;
-
         return new OrderResponse(
                 o.getId(),
                 o.getStatus().name(),
@@ -58,10 +51,7 @@ public record OrderResponse(
                 o.getCustomerId(),
                 o.getCustomerUsername(),
                 o.getRestaurantId(),
-                o.getRestaurantName(),
-                deliveryStatus,
-                driverName,
-                driverPhone
+                o.getRestaurantName()
         );
     }
 }

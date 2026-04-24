@@ -1,6 +1,5 @@
 package com.order.service.controller;
 
-import com.order.service.dto.DeliveryResponse;
 import com.order.service.dto.OrderResponse;
 import com.order.service.dto.PlaceOrderRequest;
 import com.order.service.service.OrderService;
@@ -34,7 +33,7 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getCustomerOrders(customerId));
     }
 
-    @GetMapping("/restaurants/{restaurantId}/orders")
+    @GetMapping("/orders/restaurants/{restaurantId}")
     public ResponseEntity<List<OrderResponse>> getRestaurantOrders(@PathVariable Long restaurantId) {
         return ResponseEntity.ok(orderService.getRestaurantOrders(restaurantId));
     }
@@ -47,15 +46,5 @@ public class OrderController {
     @PostMapping("/orders/{id}/cancel")
     public ResponseEntity<OrderResponse> cancel(@PathVariable Long id, @RequestParam Long customerId) {
         return ResponseEntity.ok(orderService.cancelOrder(id, customerId));
-    }
-
-    @GetMapping("/deliveries/by-order/{orderId}")
-    public ResponseEntity<DeliveryResponse> getDeliveryByOrder(@PathVariable Long orderId) {
-        return ResponseEntity.ok(orderService.getDeliveryByOrderId(orderId));
-    }
-
-    @PatchMapping("/deliveries/{deliveryId}/status")
-    public ResponseEntity<DeliveryResponse> updateDeliveryStatus(@PathVariable Long deliveryId, @RequestParam String status) {
-        return ResponseEntity.ok(orderService.updateDeliveryStatus(deliveryId, status));
     }
 }
