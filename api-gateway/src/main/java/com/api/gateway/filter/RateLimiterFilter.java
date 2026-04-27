@@ -38,8 +38,7 @@ public class RateLimiterFilter implements GlobalFilter, Ordered {
             if (!rateLimiter.acquirePermission()) {
                 log.warn("Rate limit exceeded: path={}", path);
                 exchange.getResponse().setStatusCode(HttpStatus.TOO_MANY_REQUESTS);
-                exchange.getResponse().getHeaders().add("Retry-After",
-                        String.valueOf(rateLimiter.getRateLimiterConfig().getLimitRefreshPeriod().toSeconds()));
+                exchange.getResponse().getHeaders().add("Retry-After", String.valueOf(rateLimiter.getRateLimiterConfig().getLimitRefreshPeriod().toSeconds()));
                 return exchange.getResponse().setComplete();
             }
             log.debug("Request allowed: path={}", path);

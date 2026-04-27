@@ -25,7 +25,8 @@ public class DeliveryController {
     @PatchMapping("/{id}/status")
     public ResponseEntity<DeliveryResponse> updateStatus(
             @PathVariable Long id,
-            @RequestParam String status) {
+            @RequestParam String status
+    ) {
         return ResponseEntity.ok(deliveryService.updateStatus(id, status));
     }
 }

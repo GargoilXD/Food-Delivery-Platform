@@ -90,15 +90,14 @@ public class OrderService {
         return OrderResponse.fromEntity(savedOrder);
     }
 
-    private OrderResponse placeOrderFallback(Long customerId, PlaceOrderRequest request, Throwable throwable) {
+    private OrderResponse placeOrderFallback(Long customerId, PlaceOrderRequest _request, Throwable throwable) {
         log.warn("Order placement circuit breaker triggered: customerId={}, cause={}", customerId, throwable.getMessage());
         throw new IllegalStateException("Unable to place order because a dependent service is unavailable", throwable);
     }
 
     @Transactional(readOnly = true)
     public OrderResponse getOrderById(Long orderId) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order", "id", orderId));
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new ResourceNotFoundException("Order", "id", orderId));
         return OrderResponse.fromEntity(order);
     }
 
@@ -110,15 +109,13 @@ public class OrderService {
 
     @Transactional(readOnly = true)
     public List<OrderResponse> getRestaurantOrders(Long restaurantId) {
-        return orderRepository.findByRestaurantIdOrderByCreatedAtDesc(restaurantId)
-                .stream().map(OrderResponse::fromEntity).toList();
+        return orderRepository.findByRestaurantIdOrderByCreatedAtDesc(restaurantId).stream().map(OrderResponse::fromEntity).toList();
     }
 
     @Transactional
     public OrderResponse updateOrderStatus(Long orderId, String status) {
         log.info("Updating order status: orderId={}, newStatus={}", orderId, status);
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order", "id", orderId));
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new ResourceNotFoundException("Order", "id", orderId));
 
         order.setStatus(Order.OrderStatus.valueOf(status.toUpperCase()));
         return OrderResponse.fromEntity(orderRepository.save(order));
@@ -127,16 +124,14 @@ public class OrderService {
     @Transactional
     public OrderResponse cancelOrder(Long orderId, Long customerId) {
         log.info("Cancelling order: orderId={}, customerId={}", orderId, customerId);
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order", "id", orderId));
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new ResourceNotFoundException("Order", "id", orderId));
 
         if (!order.getCustomerId().equals(customerId)) {
             log.warn("Unauthorized cancel attempt: orderId={}, requesterId={}", orderId, customerId);
             throw new UnauthorizedException("You can only cancel your own orders");
         }
 
-        if (order.getStatus() != Order.OrderStatus.PLACED
-                && order.getStatus() != Order.OrderStatus.CONFIRMED) {
+        if (order.getStatus() != Order.OrderStatus.PLACED && order.getStatus() != Order.OrderStatus.CONFIRMED) {
             log.warn("Cannot cancel order in status {}: orderId={}", order.getStatus(), orderId);
             throw new IllegalStateException("Cannot cancel order in status: " + order.getStatus());
         }

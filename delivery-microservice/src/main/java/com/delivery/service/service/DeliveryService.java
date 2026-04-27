@@ -60,8 +60,7 @@ public class DeliveryService {
     @Transactional
     public DeliveryResponse updateStatus(Long deliveryId, String status) {
         log.info("Updating delivery status: deliveryId={}, newStatus={}", deliveryId, status);
-        Delivery delivery = deliveryRepository.findById(deliveryId)
-                .orElseThrow(() -> new ResourceNotFoundException("Delivery", "id", deliveryId));
+        Delivery delivery = deliveryRepository.findById(deliveryId).orElseThrow(() -> new ResourceNotFoundException("Delivery", "id", deliveryId));
 
         Delivery.DeliveryStatus newStatus = Delivery.DeliveryStatus.valueOf(status.toUpperCase());
         delivery.setStatus(newStatus);
